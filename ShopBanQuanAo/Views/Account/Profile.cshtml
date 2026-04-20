@@ -1,0 +1,77 @@
+﻿@model User
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="card shadow-lg border-0">
+
+                <!-- HEADER -->
+                <div class="card-header bg-primary text-white text-center">
+                    <h4><i class="bi bi-person"></i> Thông tin cá nhân</h4>
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body">
+
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">
+                            @TempData["Success"]
+                        </div>
+                    }
+
+                    <form asp-action="Profile" method="post">
+
+                        <input type="hidden" asp-for="Id" />
+
+                        <!-- FullName -->
+                        <div class="mb-3">
+                            <label class="form-label">Họ tên</label>
+                            <input asp-for="FullName" class="form-control" />
+                        </div>
+
+                        <!-- Email (readonly) -->
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input asp-for="Email" class="form-control" readonly />
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="mb-3">
+                            <label class="form-label">Số điện thoại</label>
+                            <input asp-for="Phone" class="form-control" />
+                        </div>
+
+                        <!-- Address -->
+                        <div class="mb-3">
+                            <label class="form-label">Địa chỉ</label>
+                            <input asp-for="Address" class="form-control" />
+                        </div>
+
+                        <!-- Button -->
+
+                        <button class="btn btn-success w-100">
+                            <i class="bi bi-floppy2-fill"></i> Lưu thay đổi
+                        </button>
+                        <a asp-action="ChangePassword" class="btn btn-warning w-100 mt-3">
+                            <i class="bi bi-key-fill"></i> Đổi mật khẩu
+                        </a>
+                    </form>
+
+                </div>
+
+                <!-- FOOTER -->
+                <div class="card-footer text-center text-muted">
+                    Tham gia từ: @Model.CreatedAt.ToString("dd/MM/yyyy")
+                </div>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                    Quay về trang chủ
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+</div>

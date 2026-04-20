@@ -1,0 +1,611 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+@model List<Product>
+
+
+<style>
+    .logo {
+        font-weight: bold;
+        font-size: 22px;
+        color: #4e73df;
+    }
+
+    .cart-badge {
+        position: absolute;
+        top: -5px;
+        right: -10px;
+        font-size: 12px;
+    }
+
+    .category-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Scroll ngang */
+    .category-scroll {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 10px;
+        scroll-behavior: smooth;
+        padding-top: 50px;
+        cursor: grab;
+    }
+
+        /* Ẩn scrollbar */
+        .category-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+    /* Item */
+    .category-item {
+        flex: 0 0 auto;
+        padding: 8px 16px;
+        background: #f1f1f1;
+        border-radius: 20px;
+        text-decoration: none;
+        color: #333;
+        transition: all 0.25s ease;
+        white-space: nowrap;
+    }
+
+        /* Hover nảy lên */
+        .category-item:hover {
+            transform: translateY(-5px) scale(1.05);
+            background: #4e73df;
+            color: #fff;
+        }
+
+        /* Active */
+        .category-item.active {
+            background: #4e73df;
+            color: white;
+            font-weight: 500;
+        }
+
+    /* Shadow bên phải */
+    .category-wrapper::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 60px;
+        height: 100%;
+        pointer-events: none;
+        background: linear-gradient(to left, white, transparent);
+    }
+
+    .category-scroll.dragging {
+        cursor: grabbing;
+    }
+
+    /* tránh select text khi kéo */
+    .category-scroll a {
+        user-select: none;
+    }
+
+    /* Chat bot */
+    /* #chatBtn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #4e73df;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        cursor: pointer;
+    }
+
+    #chatBox {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 300px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        display: none;
+        flex-direction: column;
+    } */
+    #chatBtn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #4e73df;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        cursor: pointer;
+        z-index: 9999; /* 🔥 thêm cái này */
+    }
+
+    #chatBox {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 320px;
+        height: 420px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 9999; /* 🔥 cực kỳ quan trọng */
+    }
+
+    #chatHeader {
+        background: #4e73df;
+        color: white;
+        padding: 10px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    #messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+        background: #f9f9f9;
+    }
+
+        /* Tin nhắn */
+        #messages p {
+            margin: 5px 0;
+        }
+
+    /* Bot */
+    .bot-msg {
+        background: #e4e6eb;
+        padding: 8px 12px;
+        border-radius: 10px;
+        display: inline-block;
+    }
+
+    /* User */
+    .user-msg {
+        background: #4e73df;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 10px;
+        display: inline-block;
+        float: right;
+    }
+
+      /*   #messages {
+            height: 250px;
+            overflow-y: auto;
+            padding: 10px;
+        } */
+
+    #chatInput {
+        border-top: 1px solid #ddd;
+        display: flex;
+    }
+
+        #chatInput input {
+            flex: 1;
+            border: none;
+            padding: 10px;
+        }
+
+        #chatInput button {
+            border: none;
+            background: #4e73df;
+            color: white;
+            padding: 10px;
+        }
+
+
+</style>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg bg-white shadow-lg px-3">
+    <div class="container-fluid">
+
+        <!-- Logo -->
+        <a class="navbar-brand logo" asp-controller="Home" asp-action="Index">
+            FashionStore
+        </a>
+        <!-- Toggle mobile -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Content -->
+        <div class="collapse navbar-collapse" id="navbarContent">
+
+            <!-- Search -->
+            <form class="d-flex mx-auto w-50" asp-controller="Home" asp-action="Index">
+                <input class="form-control me-2"
+                       type="search"
+                       name="keyword"
+                       placeholder="Tìm sản phẩm...">
+                <button class="btn btn-outline-primary">Search</button>
+            </form>
+
+            <!-- Right side -->
+            <ul class="navbar-nav ms-auto align-items-center">
+
+                <!-- Cart -->
+                <li class="nav-item me-3 position-relative">
+                    <a class="nav-link" asp-controller="Cart" asp-action="Index">
+                        <i class="bi bi-cart"></i>
+                        @* <span class="badge bg-danger cart-badge">
+                            @ViewBag.CartCount
+                        </span> *@
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-square"></i> @Context.Session.GetString("UserName")
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end">
+
+                        <!-- USER -->
+                        <li>
+                            <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                                <i class="bi bi-person-circle"></i> My Account
+                            </a>
+                        </li>
+
+                        <!-- Đơn đang xử lý -->
+                        <li>
+                            <a class="dropdown-item" asp-controller="Order" asp-action="Pending">
+                                <i class="bi bi-inboxes-fill"></i> Đơn đang xử lý <span class="badge bg-danger"></span>
+                            </a>
+                        </li>
+
+                        <!-- Lịch sử -->
+                        <li>
+                            <a class="dropdown-item" asp-controller="Order" asp-action="History">
+                                <i class="bi bi-clock-history"></i> Lịch sử đơn hàng
+                            </a>
+                        </li>
+
+                        <li><hr class="dropdown-divider"></li>
+
+                        <!-- ADMIN -->
+                        @if (Context.Session.GetString("Role") == "Admin")
+                        {
+                            <li>
+                                <a class="dropdown-item text-primary" asp-controller="Admin" asp-action="Dashboard">
+                                    <i class="bi bi-bar-chart-line-fill"></i> Dashboard
+                                </a>
+                            </li>
+
+                            <li><hr class="dropdown-divider"></li>
+                        }
+
+                        <!-- LOGOUT -->
+                        <li>
+                            <a class="dropdown-item text-danger" asp-controller="Account" asp-action="Logout">
+                                <i class="bi bi-box-arrow-left"></i> Logout
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+
+            </ul>
+
+        </div>
+    </div>
+</nav>
+
+<!-- Chatbot -->
+<button id="chatBtn">💬</button>
+
+@* <div id="chatBox">
+    <div id="messages"></div>
+    <div id="chatInput">
+        <input id="inputMsg" placeholder="Hỏi gì đó..." />
+        <button onclick="sendMsg()">Gửi</button>
+    </div>
+</div> *@
+<div id="chatBox">
+
+    <!-- HEADER -->
+    <div id="chatHeader">
+        <span><i class="bi bi-robot"></i> Fashion Bot</span>
+        <span onclick="toggleChat()" style="cursor:pointer"><i class="bi bi-x-circle"></i></span>
+    </div>
+
+    <!-- MESSAGES -->
+    <div id="messages"></div>
+
+    <!-- INPUT -->
+    <div id="chatInput">
+        <input id="inputMsg" placeholder="Nhắn tin..." />
+        <button onclick="sendMsg()">➤</button>
+    </div>
+
+</div>
+<!-- BODY -->
+
+<!-- BANNER -->
+<img src="~/banner/Banner1.jpg" class="img-fluid w-100" style="max-height:500px; margin-top:20px; border-radius: 15px" />
+
+
+<div class="container mt-4">
+    @{
+        var categories = ViewBag.Categories as List<Category>;
+        int? selectedCategory = ViewBag.CategoryId;
+    }
+
+    <div class="category-wrapper mb-4 mt-1">
+        <div class="category-scroll">
+
+            <!-- Tất cả -->
+            <a asp-action="Index"
+               asp-route-categoryId=""
+               asp-route-keyword="@ViewBag.Keyword"
+               class="category-item @(selectedCategory == null ? "active" : "")">
+                Tất cả
+            </a>
+
+            @foreach (var c in categories)
+            {
+                <a asp-action="Index"
+                   asp-route-categoryId="@c.Id"
+                   asp-route-keyword="@ViewBag.Keyword"
+                   class="category-item @(selectedCategory == c.Id ? "active" : "")">
+                    @c.Name
+                </a>
+            }
+
+        </div>
+    </div>
+
+    <h3 class="mb-4"><i class="bi bi-fire"></i> Sản phẩm mới</h3>
+
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm h-100">
+
+                    <img src="~/images/@item.ImageUrl"
+                         class="card-img-top"
+                         style="height:250px; object-fit:cover;" />
+
+                    <div class="card-body d-flex flex-column">
+
+                        <h6 class="card-title">@item.Name</h6>
+
+                        <p class="text-danger fw-bold">
+                            @item.Price.ToString("N0") đ
+                        </p>
+
+                        <!-- đẩy nút xuống đáy -->
+                        <div class="mt-auto">
+                            @if (item.IsActive && item.Stock > 0)
+                            {
+                                <a asp-controller="Cart"
+                                   asp-action="AddToCart"
+                                   asp-route-id="@item.Id"
+                                   class="btn btn-primary w-100 mb-3">
+                                    <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                                </a>
+                            }
+                            else
+                            {
+                                <button class="btn btn-secondary w-100 mb-3" disabled>
+                                    ❌ Hết hàng
+                                </button>
+                            }
+                            <a asp-controller="Home"
+                               asp-action="Detail"
+                               asp-route-id="@item.Id"
+                               class="btn btn-primary w-100">
+                                Xem chi tiết
+                            </a>
+                        </div>
+
+                    </div>
+                </div> 
+               
+
+            </div>
+        }
+    </div>
+
+  @*   @{
+        int currentPage = ViewBag.CurrentPage ?? 1;
+        int totalPages = ViewBag.TotalPages ?? 1;
+        string keyword = ViewBag.Keyword as string;
+    } *@
+
+    @{
+        int currentPage = ViewBag.CurrentPage;
+        int totalPages = ViewBag.TotalPages;
+        string keyword = ViewBag.Keyword as string;
+        int start = Math.Max(1, currentPage - 2);
+        int end = Math.Min(totalPages, currentPage + 2);
+    }
+    <p class="text-center">
+        Trang @currentPage / @totalPages
+    </p>
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+
+            <!-- Prev -->
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(currentPage - 1)"
+                   asp-route-keyword="@keyword"
+                   asp-route-categoryId="@ViewBag.CategoryId">
+                    Previous
+                </a>
+            </li>
+
+            <!-- Page numbers -->
+            @* @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@i"
+                       asp-route-keyword="@keyword">
+                        @i
+                    </a>
+                </li>
+            } *@
+            @for (int i = start; i <= end; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@i"
+                       asp-route-keyword="@ViewBag.Keyword"
+                       asp-route-categoryId="@ViewBag.CategoryId"
+                    >
+                        @i
+                    </a>
+                </li>
+            }
+
+            <!-- Next -->
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(currentPage + 1)"
+                   asp-route-keyword="@keyword"
+                   asp-route-categoryId="@ViewBag.CategoryId">
+                    Next
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+</div>
+
+@*Modal*@
+<div class="modal fade" id="cartModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center p-4">
+
+            <h4 class="text-success">✔ Đã thêm vào giỏ!</h4>
+            <p id="modalProductName"></p>
+
+            <div class="mt-3">
+                <a href="/Cart" class="btn btn-primary me-2">
+                    Xem giỏ hàng
+                </a>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
+                    Tiếp tục mua
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    const slider = document.querySelector('.category-scroll');
+
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    slider.addEventListener('mousedown', (e) => {
+        isDown = true;
+        slider.classList.add('dragging');
+        startX = e.pageX - slider.offsetLeft;
+        scrollLeft = slider.scrollLeft;
+    });
+
+    slider.addEventListener('mouseleave', () => {
+        isDown = false;
+        slider.classList.remove('dragging');
+    });
+
+    slider.addEventListener('mouseup', () => {
+        isDown = false;
+        slider.classList.remove('dragging');
+    });
+
+    slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - slider.offsetLeft;
+        const walk = (x - startX) * 1.5; // tốc độ kéo
+        slider.scrollLeft = scrollLeft - walk;
+    });
+
+    @* Chatbot *@
+
+    const chatBtn = document.getElementById("chatBtn");
+    const chatBox = document.getElementById("chatBox");
+
+    chatBtn.onclick = () => {
+        chatBox.style.display = chatBox.style.display === "none" ? "flex" : "none";
+    };
+
+        function sendMsg() {
+        let msg = document.getElementById("inputMsg").value;
+
+        document.getElementById("messages").innerHTML +=
+            `<p class="user-msg">${msg}</p><div style="clear:both"></div>`;
+
+        fetch('/Chat/Ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: msg })
+        })
+        .then(res => res.json())
+        .then(data => {
+
+            if (data.type === "text") {
+                document.getElementById("messages").innerHTML +=
+                    `<p class="bot-msg">${data.reply}</p>`;
+            }
+
+            if (data.type === "product") {
+                document.getElementById("messages").innerHTML +=
+                    `<p class="bot-msg">${data.reply}</p>`;
+
+                data.data.forEach(p => {
+                    document.getElementById("messages").innerHTML += `
+                        <div style="background:white; border-radius:10px; padding:10px; margin-top:5px">
+                            <img src="/images/${p.imageUrl}" style="width:100%; border-radius:10px"/>
+                            <b>${p.name}</b>
+                            <p style="color:red">${p.price.toLocaleString()} đ</p>
+                            <a href="/Home/Detail/${p.id}" class="btn btn-sm btn-primary">Xem</a>
+                        </div>
+                    `;
+                });
+            }
+
+            scrollBottom();
+        });
+    }
+
+    @* toggle *@
+        function toggleChat() {
+        chatBox.style.display =
+            chatBox.style.display === "none" ? "flex" : "none";
+    }
+
+    @* // auto scroll xuống cuối *@
+    function scrollBottom() {
+        let box = document.getElementById("messages");
+        box.scrollTop = box.scrollHeight;
+    }
+
+</script>

@@ -1,0 +1,79 @@
+﻿@model Order
+@{
+    var recommend = ViewBag.Recommend as List<Product>;
+}
+
+<div class="container mt-4">
+
+    <h2 class="text-success mb-4"><i class="bi bi-emoji-laughing"></i> Đặt hàng thành công!</h2>
+
+    <!-- ORDER INFO -->
+    <div class="card p-3 mb-4">
+        <h5><i class="bi bi-receipt-cutoff"></i> Đơn hàng #@Model.Id</h5>
+        <p><b>Ngày:</b> @Model.OrderDate</p>
+        <p><b>Địa chỉ:</b> @Model.ShippingAddress</p>
+        <p>
+            <b>Tổng tiền:</b>
+            <span class="text-danger">@Model.TotalAmount.ToString("N0") đ</span>
+        </p>
+    </div>
+
+    <!-- ORDER ITEMS -->
+    <h5><i class="bi bi-box-seam-fill"></i> Sản phẩm đã đặt</h5>
+
+    @foreach (var item in Model.OrderDetails)
+    {
+        <div class="d-flex border p-2 mb-2 align-items-center">
+            <img src="~/images/@item.Product.ImageUrl" width="80" />
+
+            <div class="ms-3 flex-grow-1">
+                <h6>@item.Product.Name</h6>
+                <small>Số lượng: @item.Quantity</small>
+            </div>
+
+            <div class="text-danger fw-bold">
+                @(item.UnitPrice* item.Quantity) đ
+            </div>
+        </div>
+    }
+
+    <!-- RECOMMEND -->
+    <h5 class="mt-5"><i class="bi bi-fire"></i> Gợi ý cho bạn</h5>
+
+    <div class="row">
+        @foreach (var item in recommend)
+        {
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 shadow-sm">
+
+                    <img src="~/images/@item.ImageUrl"
+                         class="card-img-top"
+                         style="height:200px; object-fit:cover;" />
+
+                    <div class="card-body d-flex flex-column">
+                        <h6>@item.Name</h6>
+
+                        <p class="text-danger">
+                            @item.Price đ
+                        </p>
+
+                        <a asp-controller="Cart"
+                           asp-action="AddToCart"
+                           asp-route-id="@item.Id"
+                           class="btn btn-success mt-auto">
+                            Thêm vào giỏ
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="text-center">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+            Quay về trang chủ
+        </a>
+    </div>
+
+</div>

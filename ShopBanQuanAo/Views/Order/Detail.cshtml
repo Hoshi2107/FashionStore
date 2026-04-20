@@ -1,0 +1,122 @@
+﻿@model Order
+
+<style>
+    .step {
+        text-align: center;
+        flex: 1;
+    }
+
+    .step-circle {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #ccc;
+        margin: auto;
+        line-height: 30px;
+        color: white;
+    }
+
+    .step.active .step-circle {
+        background: #28a745;
+    }
+
+    .step-label {
+        font-size: 13px;
+        margin-top: 5px;
+    }
+</style>
+
+<div class="container mt-4">
+
+    <h3><i class="bi bi-box2"></i> Chi tiết đơn hàng #@Model.Id</h3>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary mb-3">← Quay lại trang chủ</a>
+    <!-- PROGRESS -->
+    @{
+        int step = Model.Status switch
+        {
+            "Pending" => 1,
+            "Confirmed" => 2,
+            "Shipping" => 3,
+            "Completed" => 4,
+            "Cancelled" => 0,
+            _ => 1
+        };
+    }
+
+    <div class="d-flex align-items-center my-4">
+        @if(Model.Status == "Cancelled")
+        {
+            <div class="text-danger me-3 fw-bolder">
+                <b>Đơn đã bị hủy</b>
+            </div>
+        }
+
+        <div class="step @(step >= 1 ? "active" : "")">
+            <div class="step-circle">1</div>
+            <div class="step-label">Chờ xử lý</div>
+        </div>
+
+        <div class="step @(step >= 2 ? "active" : "")">
+            <div class="step-circle">2</div>
+            <div class="step-label">Đã xác nhận</div>
+        </div>
+
+        <div class="step @(step >= 3 ? "active" : "")">
+            <div class="step-circle">3</div>
+            <div class="step-label">Đang giao</div>
+        </div>
+
+        <div class="step @(step >= 4 ? "active" : "")">
+            <div class="step-circle">4</div>
+            <div class="step-label">Đã nhận</div>
+        </div>
+
+    </div>
+
+    <!-- INFO -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5><i class="bi bi-person-fill"></i> Thông tin người nhận</h5>
+            <p><b>Tên:</b> @Model.User.FullName</p>
+            <p><b>SĐT:</b> @Model.User.Phone</p>
+            <p><b>Địa chỉ:</b> @Model.ShippingAddress</p>
+            <p><b>Ghi chú:</b> @Model.Note</p>
+        </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <h5><i class="bi bi-cart"></i> Sản phẩm</h5>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ảnh</th>
+                <th>Tên</th>
+                <th>SL</th>
+                <th>Giá</th>
+                <th>Tổng</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model.OrderDetails)
+            {
+                <tr>
+                    <td>
+                        <img src="~/images/@item.Product.ImageUrl" width="70" />
+                    </td>
+                    <td>@item.Product.Name</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.UnitPrice.ToString("N0") đ</td>
+                    <td>@(item.Quantity* item.UnitPrice) đ</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- TOTAL -->
+    <h4 class="text-end text-danger">
+        Tổng tiền: @Model.TotalAmount.ToString("N0") đ
+    </h4>
+
+</div>

@@ -1,0 +1,27 @@
+﻿@model Category
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h3>➕ Thêm danh mục</h3>
+
+<form asp-action="CreateCategory" method="post">
+
+    <div class="mb-3">
+        <label>Tên danh mục</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Mô tả</label>
+        <input asp-for="Description" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Slug</label>
+        <input asp-for="Slug" class="form-control" />
+    </div>
+
+    <button class="btn btn-success">Lưu</button>
+
+</form>

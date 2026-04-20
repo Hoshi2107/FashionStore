@@ -1,0 +1,130 @@
+﻿@model List<Product>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h3><i class="bi bi-cart"></i> Quản lý sản phẩm</h3>
+
+<a asp-action="Create" class="btn btn-success mb-3">+ Thêm sản phẩm</a>
+
+<table class="table table-bordered align-middle">
+    <thead>
+        <tr>
+            <th>Ảnh</th>
+            <th>Tên</th>
+            <th>Size</th>
+            <th>Màu</th>
+            <th>Stock</th>
+            <th>Giá</th>
+            <th>Danh mục</th>
+            <th>Trạng thái</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td>
+                    <img src="~/images/@p.ImageUrl" width="100" />
+                </td>
+                <td>@p.Name</td>
+                <td>@p.Size</td>
+                <td>@p.Color</td>
+                <td>@p.Stock</td>
+                <td>@p.Price đ</td>
+                <td>@p.Category?.Name</td>
+
+                <td>
+                    @if (p.IsActive)
+                    {
+                        <span class="badge bg-success">Còn hàng</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Hết hàng</span>
+                    }
+                </td>
+
+                <td class="mb-2">
+                    <div class="d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@p.Id"
+                       class="btn btn-warning btn-sm">Sửa</a>
+
+                    @if (p.IsActive)
+                    {
+                        <a asp-action="Toggle" asp-route-id="@p.Id"
+                           class="btn btn-danger btn-sm">Ngừng bán</a>
+                    }
+                    else
+                    {
+                        <a asp-action="Toggle" asp-route-id="@p.Id"
+                           class="btn btn-success btn-sm">Bán lại</a>
+                    }
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@* @{
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+} *@
+@{
+int currentPage = ViewBag.CurrentPage;
+int totalPages = ViewBag.TotalPages;
+
+int start = Math.Max(1, currentPage - 2);
+int end = Math.Min(totalPages, currentPage + 2);
+}
+<p class="text-center">
+    Trang @currentPage / @totalPages
+</p>
+<nav>
+    <ul class="pagination justify-content-center">
+
+        <!-- Prev -->
+        <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+            <a class="page-link"
+               asp-action="Index"
+               asp-route-page="@(currentPage - 1)">
+                Previous
+            </a>
+        </li>
+
+        <!-- Page numbers -->
+        @* @for (int i = 1; i <= totalPages; i++)
+        {
+            <li class="page-item @(i == currentPage ? "active" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@i">
+                    @i
+                </a>
+            </li>
+        } *@
+        @for (int i = start; i <= end; i++)
+        {
+            <li class="page-item @(i == currentPage ? "active" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@i"
+                   asp-route-keyword="@ViewBag.Keyword">
+                    @i
+                </a>
+            </li>
+        }
+
+        <!-- Next -->
+        <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+            <a class="page-link"
+               asp-action="Index"
+               asp-route-page="@(currentPage + 1)">
+                Next
+            </a>
+        </li>
+
+    </ul>
+</nav>

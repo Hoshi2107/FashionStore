@@ -1,0 +1,79 @@
+﻿@model CheckoutVM
+@{
+    var cart = ViewBag.Cart as List<CartItem>;
+    var total = cart.Sum(x => x.Price * x.Quantity);
+}
+
+<div class="container mt-4">
+    <div class="row">
+
+        <!-- LEFT: CART -->
+        <div class="col-md-7">
+            <h4><i class="bi bi-cart-check-fill"></i> Sản phẩm</h4>
+
+            @foreach (var item in cart)
+            {
+                <div class="d-flex border p-2 mb-2 align-items-center">
+                    <img src="~/images/@item.ImageUrl" width="80" />
+
+                    <div class="ms-3 flex-grow-1">
+                        <h6>@item.Name</h6>
+                        <small>Số lượng: @item.Quantity</small>
+                    </div>
+
+                    <div class="text-danger fw-bold">
+                        @(item.Price* item.Quantity) đ
+                    </div>
+                </div>
+            }
+
+            <h5 class="text-end mt-3">
+                Tổng: <span class="text-danger">@total.ToString("N0") đ</span>
+            </h5>
+        </div>
+
+        <!-- RIGHT: CHECKOUT -->
+        <div class="col-md-5">
+            <h4><i class="bi bi-box2-fill"></i> Thông tin đơn hàng</h4>
+
+            <form asp-action="Checkout" method="post">
+
+                <div class="mb-2">
+                    <label>Họ tên</label>
+                    <input asp-for="FullName" class="form-control" />
+                </div>
+
+                <div class="mb-2">
+                    <label>SĐT</label>
+                    <input asp-for="Phone" class="form-control" />
+                </div>
+
+                <div class="mb-2">
+                    <label>Địa chỉ</label>
+                    <input asp-for="Address" class="form-control" />
+                </div>
+
+                <div class="mb-2">
+                    <label>Ghi chú</label>
+                    <textarea asp-for="Note" class="form-control"></textarea>
+                </div>
+
+                <!-- PAYMENT -->
+                <div class="mb-3">
+                    <label>Phương thức thanh toán</label>
+
+                    <select class="form-select" name="PaymentMethod">
+                        <option value="COD">Thanh toán khi nhận hàng</option>
+                        <option value="Bank">Chuyển khoản</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-success w-100">
+                    Đặt hàng
+                </button>
+
+            </form>
+        </div>
+
+    </div>
+</div>

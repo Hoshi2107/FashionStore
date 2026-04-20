@@ -1,0 +1,45 @@
+﻿@model List<Category>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h3><i class="bi bi-card-list"></i> Danh mục sản phẩm</h3>
+
+<a asp-action="CreateCategory" class="btn btn-success mb-3">
+    + Thêm danh mục
+</a>
+
+<table class="table table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>Tên</th>
+            <th>Mô tả</th>
+            <th>Slug</th>
+            <th>Trạng thái</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.Id</td>
+                <td>@c.Name</td>
+                <td>@c.Description</td>
+                <td>@c.Slug</td>
+
+                <td>
+                    @if (c.IsActive)
+                    {
+                        <span class="badge bg-success">Hiển thị</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Ẩn</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

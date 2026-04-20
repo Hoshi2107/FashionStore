@@ -1,0 +1,101 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h3><i class="bi bi-bar-chart-fill"></i> Dashboard</h3>
+
+<div class="row mt-4">
+
+    <!-- USERS -->
+    <div class="col-md-3">
+        <div class="card bg-primary text-white shadow">
+            <div class="card-body">
+                <h5><i class="bi bi-person-vcard"></i> Số lượng người dùng</h5>
+                <h3>@ViewBag.TotalUsers</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMPLETED -->
+    <div class="col-md-3">
+        <div class="card bg-success text-white shadow">
+            <div class="card-body">
+                <h5><i class="bi bi-box2-heart-fill"></i> Đơn đã giao</h5>
+                <h3>@ViewBag.CompletedOrders</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- PENDING -->
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark shadow">
+            <div class="card-body">
+                <h5><i class="bi bi-hourglass-split"></i> Đang chờ xử lý</h5>
+                <h3>@ViewBag.PendingOrders</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- REVENUE -->
+    <div class="col-md-3">
+        <div class="card bg-danger text-white shadow">
+            <div class="card-body">
+                <h5><i class="bi bi-cash-coin"></i> Tổng doanh thu</h5>
+                <h3>@String.Format("{0:N0}", ViewBag.Revenue) đ</h3>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- CHART -->
+<div class="card mt-4 shadow">
+    <div class="card-header">
+        <i class="bi bi-graph-up-arrow"></i> Doanh thu theo tháng
+    </div>
+    <div class="card-body">
+        <canvas id="myChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    var labels = @Html.Raw(Json.Serialize(ViewBag.ChartLabels));
+    var data = @Html.Raw(Json.Serialize(ViewBag.ChartData));
+
+    var ctx = document.getElementById('myChart');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Doanh thu',
+                data: data,
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                backgroundColor: "rgba(78,115,223,0.2)",
+                borderColor: "#4e73df"
+            }]
+        },
+        options: {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let value = context.raw;
+
+                            if (value === 0) {
+                                return "Chưa có dữ liệu";
+                            }
+
+                            return "Doanh thu: " + value.toLocaleString() + " đ";
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>

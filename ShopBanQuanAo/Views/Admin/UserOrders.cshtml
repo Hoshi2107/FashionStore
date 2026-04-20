@@ -1,0 +1,56 @@
+﻿@model List<Order>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var user = ViewBag.User as User;
+}
+
+<h3><i class="bi bi-box-seam"></i> Đơn hàng của @user.FullName</h3>
+
+<div class="row mt-4">
+
+    @foreach (var order in Model)
+    {
+        @foreach (var item in order.OrderDetails)
+        {
+        <div class="col-md-6 mb-4">
+
+            <div class="card shadow-sm">
+
+                <!-- HEADER -->
+                <div class="card-header bg-dark text-white">
+                    Mã đơn: #@order.Id
+                    <span class="float-end">@order.Status</span>
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body">
+                    <div class="d-flex justify-content-between border-bottom py-2">
+                        <div>
+                            <b>@item.Product.Name</b><br />
+                            <small>x @item.Quantity</small>
+                        </div>
+
+                        <div class="text-danger">
+                            @(item.UnitPrice* item.Quantity) đ
+                        </div>
+                    </div>
+                    <p><b>Ngày đặt:</b> @order.OrderDate.ToString("dd/MM/yyyy")</p>
+                    <p><b>Địa chỉ:</b> @order.ShippingAddress</p>
+
+                </div>
+
+                <!-- FOOTER -->
+                <div class="card-footer text-end">
+                    <b>Tổng:</b>
+                    <span class="text-danger">
+                        @order.TotalAmount.ToString("N0") đ
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+        }
+    }
+
+</div>

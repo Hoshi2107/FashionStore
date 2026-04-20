@@ -1,0 +1,49 @@
+﻿@model Product
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<h3><i class="bi bi-pencil-square"></i> Sửa sản phẩm</h3>
+<div asp-validation-summary="All" class="text-danger"></div>
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="ImageUrl" />
+
+    <label class="form-label">Tên sản phẩm</label>
+    <input asp-for="Name" class="form-control mb-2" />
+
+    <label class="form-label">Mô tả</label>
+    <textarea asp-for="Description" class="form-control mb-2"></textarea>
+
+    <label class="form-label">Giá</label>
+    <input asp-for="Price" class="form-control mb-2" />
+
+    <label class="form-label">Số lượng</label>
+    <input asp-for="Stock" class="form-control mb-2" />
+
+    <label class="form-label">Size</label>
+    <input asp-for="Size" class="form-control mb-2" placeholder="S, M, L..." />
+
+    <label class="form-label">Màu</label>
+    <input asp-for="Color" class="form-control mb-2" />
+
+    <label class="form-label">Danh mục</label>
+    <select asp-for="CategoryId" class="form-control mb-2">
+        <option value="0" disabled>-- Chọn danh mục --</option>
+        @foreach (var c in ViewBag.Categories)
+        {
+            <option value="@c.Id">@c.Name</option>
+        }
+    </select>
+    <span asp-validation-for="CategoryId" class="text-danger"></span>
+
+    <label class="form-label">Ảnh hiện tại</label>
+    <div class="mb-2">
+        <img src="~/images/@Model.ImageUrl" width="120" class="rounded border" />
+    </div>
+
+    <label class="form-label">Đổi ảnh mới (không bắt buộc)</label>
+    <input type="file" name="ImageFile" class="form-control mb-3" />
+
+    <button type="submit" class="btn btn-warning">💾 Lưu thay đổi</button>
+    <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+</form>

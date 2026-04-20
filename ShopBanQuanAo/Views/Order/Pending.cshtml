@@ -1,0 +1,96 @@
+﻿@model List<Order>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<style>
+    .order-card {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        cursor: pointer;
+    }
+
+        /* .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        } */
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            background-color: #f8f9fa;
+        }
+</style>
+
+<div class="container mt-4">
+
+    <h3 class="mb-4"><i class="bi bi-box-seam"></i> Đơn đang xử lý</h3>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary mb-3">← Quay lại trang chủ</a>
+    <div class="row">
+        @foreach (var order in Model)
+        {
+
+            <div class="col-md-6 mb-4">
+                <a asp-controller="Order" asp-action="Detail" asp-route-id="@order.Id" class="text-dark text-decoration-none">
+                <div class="card order-card">
+
+                    <!-- HEADER -->
+                    <div class="card-header bg-primary text-white">
+                        Mã đơn: #@order.Id
+                        <span class="float-end">@order.Status</span>
+
+                    </div>
+
+                    <!-- BODY -->
+                    <div class="card-body">
+
+                        @foreach (var item in order.OrderDetails)
+                        {
+                            <div class="d-flex justify-content-between border-bottom py-2">
+                                <div>
+                                    <b>@item.Product.Name</b><br />
+                                    <small>Số lượng: @item.Quantity</small>
+                                </div>
+
+                                <div class="text-danger">
+                                    @(item.UnitPrice* item.Quantity) đ
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="card-footer text-end">
+                        <b>Tổng:</b>
+                        <span class="text-danger">
+                            @order.TotalAmount đ
+                        </span>
+                            @if (order.Status == "Pending")
+                            {
+                                <a asp-action="Cancel"
+                                   asp-route-id="@order.Id"
+                                   class="btn btn-danger btn-sm mt-2"
+                                   onclick="return confirm('Bạn có chắc muốn hủy đơn này không?')">
+                                    ❌ Hủy đơn
+                                </a>
+                            }
+                    </div>
+                </div>
+                </a>
+            </div>
+
+        }
+    </div>
+
+</div>

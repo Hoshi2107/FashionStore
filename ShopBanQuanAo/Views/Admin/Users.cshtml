@@ -1,0 +1,74 @@
+﻿@model List<User>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h3><i class="bi bi-person-fill"></i> Quản lý người dùng</h3>
+
+<table class="table table-bordered align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>Họ tên</th>
+            <th>Email</th>
+            <th>SĐT</th>
+            <th>Địa chỉ</th>
+            <th>Trạng thái</th>
+            <th>Ngày tạo</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var u in Model)
+        {
+            <tr>
+                <td>@u.Id</td>
+                <td>@u.FullName</td>
+                <td>@u.Email</td>
+                <td>@u.Phone</td>
+                <td>@u.Address</td>
+
+                <!-- STATUS -->
+                <td>
+                    @if (u.IsActive)
+                    {
+                        <span class="badge bg-success">Hoạt động</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Đã khóa</span>
+                    }
+                </td>
+
+                <td>@u.CreatedAt.ToString("dd/MM/yyyy")</td>
+
+                <!-- ACTION -->
+                <td>
+                    <a asp-action="UserOrders"
+                       asp-route-id="@u.Id"
+                       class="btn btn-primary btn-sm mb-3">
+                        <i class="bi bi-box-seam"></i> Đơn hàng
+                    </a>
+
+                    @if (u.IsActive)
+                    {
+                        <a asp-action="ToggleUser"
+                           asp-route-id="@u.Id"
+                           class="btn btn-danger btn-sm">
+                            <i class="bi bi-lock"></i> Khóa
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-action="ToggleUser"
+                           asp-route-id="@u.Id"
+                           class="btn btn-success btn-sm">
+                            <i class="bi bi-unlock"></i> Mở
+                        </a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

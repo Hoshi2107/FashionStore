@@ -1,0 +1,92 @@
+﻿@model Product
+
+<div class="container mt-4">
+
+    <div class="row">
+
+        <!-- IMAGE -->
+        <div class="col-md-5">
+            <img src="~/images/@Model.ImageUrl"
+                 class="img-fluid rounded shadow" />
+        </div>
+
+        <!-- INFO -->
+        <div class="col-md-7">
+
+            <h3>@Model.Name</h3>
+
+            <p class="text-muted">@Model.Category?.Name</p>
+
+            <h4 class="text-danger">
+                @Model.Price đ
+            </h4>
+
+            <p>@Model.Description</p>
+
+            <p><b>Size:</b> @Model.Size</p>
+            <p><b>Màu:</b> @Model.Color</p>
+            <p><b>Còn lại:</b> @Model.Stock</p>
+
+            <!-- BUTTON -->
+            @if (Model.IsActive && Model.Stock > 0)
+            {
+                <a asp-controller="Cart"
+                   asp-action="AddToCart"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-primary btn-lg mt-3">
+                    <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                </a>
+            }
+            else
+            {
+                <button class="btn btn-secondary btn-lg mt-3" disabled>
+                    ❌ Hết hàng
+                </button>
+            }
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="btn btn-outline-secondary btn-lg mt-3 ms-2">
+                Quay lại trang chủ
+            </a>
+        </div>
+    </div>
+
+    <!-- RELATED -->
+    <hr class="my-5" />
+
+    <h4><i class="bi bi-fire"></i> Sản phẩm liên quan</h4>
+
+    <div class="row mt-3">
+        @foreach (var item in ViewBag.Related)
+        {
+            <div class="col-md-3 mb-3">
+                <div class="card h-100 shadow-sm">
+
+                    <img src="~/images/@item.ImageUrl"
+                         class="card-img-top"
+                         style="height:200px; object-fit:cover;" />
+
+                    <div class="card-body d-flex flex-column">
+
+                        <h6>@item.Name</h6>
+
+                        <p class="text-danger fw-bold">
+                            @item.Price.ToString("N0") đ
+                        </p>
+
+                        <div class="mt-auto d-grid gap-2">
+                            <a asp-controller="Home"
+                               asp-action="Detail"
+                               asp-route-id="@item.Id"
+                               class="btn btn-outline-primary btn-sm">
+                                Xem
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+</div>
