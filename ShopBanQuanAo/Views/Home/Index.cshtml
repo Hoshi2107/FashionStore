@@ -232,7 +232,8 @@
                 <input class="form-control me-2"
                        type="search"
                        name="keyword"
-                       placeholder="Tìm sản phẩm...">
+                       placeholder="Tìm sản phẩm..."
+                       value="@ViewBag.Keyword">
                 <button class="btn btn-outline-primary">Search</button>
             </form>
 
@@ -371,7 +372,7 @@
         </div>
     </div>
 
-    <h3 class="mb-4"><i class="bi bi-fire"></i> Sản phẩm mới</h3>
+    <h3 class="mb-4" id="product-list"><i class="bi bi-fire"></i> Sản phẩm mới</h3>
 
     <div class="row">
         @foreach (var item in Model)
@@ -608,4 +609,24 @@
         box.scrollTop = box.scrollHeight;
     }
 
+        @* // Thêm vào cuối *@
+    document.querySelector('form[action*="Index"]')?.addEventListener('submit', function() {
+        sessionStorage.setItem('scrollToProducts', '1');
+    });
+
+    window.addEventListener('load', function() {
+        if (sessionStorage.getItem('scrollToProducts') === '1') {
+            sessionStorage.removeItem('scrollToProducts');
+            const el = document.getElementById('product-list');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+
+    @*     // Thêm vào cuối <script>
+    // Scroll về product-list khi có filter/search params *@
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('categoryId') || urlParams.has('keyword') || urlParams.has('page')) {
+        const el = document.getElementById('product-list');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
 </script>
