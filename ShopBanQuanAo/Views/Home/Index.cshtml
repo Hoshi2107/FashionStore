@@ -244,9 +244,12 @@
                 <li class="nav-item me-3 position-relative">
                     <a class="nav-link" asp-controller="Cart" asp-action="Index">
                         <i class="bi bi-cart"></i>
-                        @* <span class="badge bg-danger cart-badge">
-                            @ViewBag.CartCount
-                        </span> *@
+                        @if (ViewBag.CartCount > 0)
+                        {
+                            <span class="badge bg-danger cart-badge">
+                                @ViewBag.CartCount
+                            </span>
+                        }
                     </a>
                 </li>
 

@@ -67,7 +67,17 @@ namespace ShopBanQuanAo.Controllers
                 .Take(pageSize)
                 .ToList();
 
+            // cart count
+            var cart = HttpContext.Session.GetString("Cart");
+            int cartCount = 0;
+            if (cart != null)
+            {
+                var list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CartItem>>(cart);
+                cartCount = list?.Sum(x => x.Quantity) ?? 0;
+            }
 
+
+            ViewBag.CartCount = cartCount;
             ViewBag.Categories = _context.Categories.ToList();
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
